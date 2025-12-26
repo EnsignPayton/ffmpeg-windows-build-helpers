@@ -609,6 +609,17 @@ std_compile ()
 
   download_extract "$url"
 
+  # Patch for GMP on GCC 15
+  if [ "$pkg" = "gmp" ]; then
+    local gccver=$(gcc -dumpversion)
+    if [ "$gccver" -gt 14 ]; then
+      cd "$pkg-$ver"
+      patch -p1 < "../../../../gmp-gcc-15.patch"
+      autoreconf -vif
+      cd ".."
+    fi
+  fi
+
   if ! check_pkg_touch_success "$pkg" "$ver" 'configure' "$uname_m"; then
     clean_build
     build_progress "$pkg" 'Configuring'
