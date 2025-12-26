@@ -2432,7 +2432,7 @@ build_ffmpeg() {
     config_options+=" --enable-fontconfig"
     config_options+=" --enable-gmp"
     config_options+=" --enable-libass"
-    config_options+=" --enable-libbluray"
+    #config_options+=" --enable-libbluray"
     config_options+=" --enable-libbs2b"
     config_options+=" --enable-libflite"
     config_options+=" --enable-libfreetype"
@@ -2755,7 +2755,7 @@ build_ffmpeg_dependencies() {
   build_libilbc # Uses dlfcn.
   build_libmodplug # Uses dlfcn.
   build_libgme
-  build_libbluray # Needs libxml >= 2.6, freetype, fontconfig. Uses dlfcn.
+  #build_libbluray # Needs libxml >= 2.6, freetype, fontconfig. Uses dlfcn.
   build_libbs2b # Needs libsndfile. Uses dlfcn.
   build_libsoxr
   build_libflite
