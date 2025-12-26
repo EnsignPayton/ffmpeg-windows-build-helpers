@@ -345,6 +345,7 @@ install_cross_compiler() {
     if [[ ($compiler_flavors == "win32" || $compiler_flavors == "multi") && ! -f ../$win32_gcc ]]; then
       echo "Building win32 cross compiler..."
       download_gcc_build_script $zeranoe_script_name
+      download_gcc_build_script "gmp-gcc-15.patch"
       if [[ `uname` =~ "5.1" ]]; then # Avoid using secure API functions for compatibility with msvcrt.dll on Windows XP.
         sed -i "s/ --enable-secure-api//" $zeranoe_script_name
       fi
@@ -361,6 +362,7 @@ install_cross_compiler() {
     if [[ ($compiler_flavors == "win64" || $compiler_flavors == "multi") && ! -f ../$win64_gcc ]]; then
       echo "Building win64 x86_64 cross compiler..."
       download_gcc_build_script $zeranoe_script_name
+      download_gcc_build_script "gmp-gcc-15.patch"
       CFLAGS=-O2 CXXFLAGS=-O2 nice ./$zeranoe_script_name $zeranoe_script_options --build-type=win64 || exit 1
       if [[ ! -f ../$win64_gcc ]]; then
         echo "Failure building 64 bit gcc? Recommend nuke sandbox (rm -rf sandbox) and start over..."
