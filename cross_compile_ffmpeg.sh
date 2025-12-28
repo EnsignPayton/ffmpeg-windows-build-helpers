@@ -2406,13 +2406,20 @@ build_ffmpeg() {
 
   cd $output_dir
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
+
+    # Lazy check, just copied above
+    if [[ $ffmpeg_git_checkout_version == *"n4.4"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.3"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.2"* ]]; then
+      git apply $patch_dir/ffmpeg.git-f9626d1065c43f1d51afe66bdf988b9f33729440.patch
+      git apply $patch_dir/ffmpeg.git-f01fdedb69e4accb1d1555106d8f682ff1f1ddc7.patch
+    fi
+
     if [ "$bits_target" = "32" ]; then
       local arch=x86
     else
       local arch=x86_64
     fi
 
-    init_options="--pkg-config=pkg-config --pkg-config-flags=--static --extra-version=ffmpeg-windows-build-helpers --enable-version3 --disable-debug --disable-w32threads"
+    init_options="--pkg-config=pkg-config --pkg-config-flags=--static --extra-version=ffmpeg-windows-build-helpers --enable-version3 --disable-debug --disable-w32threads --disable-doc"
     if [[ $compiler_flavors != "native" ]]; then
       init_options+=" --arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix"
     else

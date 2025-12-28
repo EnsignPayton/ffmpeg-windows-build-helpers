@@ -1,0 +1,57 @@
+From f9626d1065c43f1d51afe66bdf988b9f33729440 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sat, 15 May 2021 00:42:38 +0300
+Subject: [PATCH] ffbuild: Avoid using the --preprocessor argument to windres
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Instead use --preprocessor-arg; in binutils 2.36, the --preprocessor
+flag was changed so that it no longer accepts a string containing
+multiple arguments, but the whole --preprocessor argument is
+treated as the path to the preprocessor executable (where the path
+can contain spaces).
+
+It's currently unclear whether this behaviour will stay or if it
+is going to be reverted in the future, see discussion at [1]. Just
+to be safe, avoid using the --preprocessor argument. Don't redeclare
+the full preprocessing command, but just add the $(CC_DEPFLAGS) options.
+
+Based on a patch by Kyle Schwartz.
+
+[1] https://sourceware.org/bugzilla/show_bug.cgi?id=27594
+
+Signed-off-by: Martin StorsjÃ¶ <martin@martin.st>
+---
+ configure          | 1 -
+ ffbuild/common.mak | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 6bfd98b384..87c8e85fe6 100755
+--- a/configure
++++ b/configure
+@@ -7535,7 +7535,6 @@ LD_LIB=$LD_LIB
+ LD_PATH=$LD_PATH
+ DLLTOOL=$dlltool
+ WINDRES=$windres
+-DEPWINDRES=$dep_cc
+ DOXYGEN=$doxygen
+ LDFLAGS=$LDFLAGS
+ LDEXEFLAGS=$LDEXEFLAGS
+diff --git a/ffbuild/common.mak b/ffbuild/common.mak
+index 32f5b997b5..5d8f3dfc1f 100644
+--- a/ffbuild/common.mak
++++ b/ffbuild/common.mak
+@@ -90,7 +90,7 @@ COMPILE_MSA = $(call COMPILE,CC,MSAFLAGS)
+ 	-$(if $(ASMSTRIPFLAGS), $(STRIP) $(ASMSTRIPFLAGS) $@)
+ 
+ %.o: %.rc
+-	$(WINDRES) $(IFLAGS) --preprocessor "$(DEPWINDRES) -E -xc-header -DRC_INVOKED $(CC_DEPFLAGS)" -o $@ $<
++	$(WINDRES) $(IFLAGS) $(foreach ARG,$(CC_DEPFLAGS),--preprocessor-arg "$(ARG)") -o $@ $<
+ 
+ %.i: %.c
+ 	$(CC) $(CCFLAGS) $(CC_E) $<
+-- 
+2.25.1
+
