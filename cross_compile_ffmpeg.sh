@@ -2426,22 +2426,22 @@ build_ffmpeg() {
       # Fix WinXP incompatibility by disabling Microsoft's Secure Channel, because Windows XP doesn't support TLS 1.1 and 1.2, but with GnuTLS or OpenSSL it does.  XP compat!
     fi
     config_options="$init_options"
-    config_options+=" --enable-libcaca"
+    #config_options+=" --enable-libcaca"
     config_options+=" --enable-gray"
-    config_options+=" --enable-libtesseract"
-    config_options+=" --enable-fontconfig"
+    #config_options+=" --enable-libtesseract"
+    #config_options+=" --enable-fontconfig"
     config_options+=" --enable-gmp"
     config_options+=" --enable-libass"
     #config_options+=" --enable-libbluray"
-    config_options+=" --enable-libbs2b"
+    #config_options+=" --enable-libbs2b"
     config_options+=" --enable-libflite"
-    config_options+=" --enable-libfreetype"
+    #config_options+=" --enable-libfreetype"
     config_options+=" --enable-libfribidi"
-    config_options+=" --enable-libharfbuzz"
-    config_options+=" --enable-filter=drawtext"
+    #config_options+=" --enable-libharfbuzz"
+    #config_options+=" --enable-filter=drawtext"
     config_options+=" --enable-libgme"
     config_options+=" --enable-libgsm"
-    config_options+=" --enable-libilbc"
+    #config_options+=" --enable-libilbc"
     config_options+=" --enable-libmodplug"
     config_options+=" --enable-libmp3lame"
     config_options+=" --enable-libopencore-amrnb"
@@ -2452,24 +2452,24 @@ build_ffmpeg() {
     config_options+=" --enable-libspeex"
     config_options+=" --enable-libtheora"
     config_options+=" --enable-libtwolame"
-    config_options+=" --enable-libvo-amrwbenc"
+    #config_options+=" --enable-libvo-amrwbenc"
     config_options+=" --enable-libvorbis"
     config_options+=" --enable-libwebp"
     config_options+=" --enable-libzimg"
     config_options+=" --enable-libzvbi"
-    config_options+=" --enable-libmysofa"
+    #config_options+=" --enable-libmysofa"
     config_options+=" --enable-libopenjpeg"
     config_options+=" --enable-libopenh264"
-    config_options+=" --enable-libvmaf"
+    #config_options+=" --enable-libvmaf"
     config_options+=" --enable-libsrt"
     config_options+=" --enable-libxml2"
     config_options+=" --enable-opengl"
     config_options+=" --enable-libdav1d"
     config_options+=" --enable-gnutls"
 
-    if [[ $OSTYPE != darwin* ]]; then
-      config_options+=" --enable-vulkan"
-    fi
+    #if [[ $OSTYPE != darwin* ]]; then
+      #config_options+=" --enable-vulkan"
+    #fi
 
     if [[ "$bits_target" != "32" ]]; then
       if [[ $build_svt_hevc = y ]]; then
@@ -2503,12 +2503,14 @@ build_ffmpeg() {
         fi
         config_options+=" --enable-libsvtvp9"
       fi
-      # SVT-AV1
-      # Apply patch on newer versions
-      if [[ $ffmpeg_git_checkout_version != *"n6"* ]] && [[ $ffmpeg_git_checkout_version != *"n5"* ]] && [[ $ffmpeg_git_checkout_version != *"n4"* ]] && [[ $ffmpeg_git_checkout_version != *"n3"* ]] && [[ $ffmpeg_git_checkout_version != *"n2"* ]]; then
-        git apply "$work_dir/SVT-AV1_git/.gitlab/workflows/linux/ffmpeg_n7_fix.patch"
+      if [[ $build_svt_av1 = y ]]; then
+        # SVT-AV1
+        # Apply patch on newer versions
+        if [[ $ffmpeg_git_checkout_version != *"n6"* ]] && [[ $ffmpeg_git_checkout_version != *"n5"* ]] && [[ $ffmpeg_git_checkout_version != *"n4"* ]] && [[ $ffmpeg_git_checkout_version != *"n3"* ]] && [[ $ffmpeg_git_checkout_version != *"n2"* ]]; then
+          git apply "$work_dir/SVT-AV1_git/.gitlab/workflows/linux/ffmpeg_n7_fix.patch"
+        fi
+        config_options+=" --enable-libsvtav1"
       fi
-      config_options+=" --enable-libsvtav1"
     fi # else doesn't work/matter with 32 bit
     config_options+=" --enable-libvpx"
     config_options+=" --enable-libaom"
@@ -2772,7 +2774,9 @@ build_ffmpeg_dependencies() {
     if [[ $build_svt_vp9 = y ]]; then
       build_svt-vp9
     fi
-    build_svt-av1
+    if [[ $build_svt_av1 = y ]]; then
+      build_svt-av1
+    fi
   fi
   build_vidstab
   #build_facebooktransform360 # needs modified ffmpeg to use it so not typically useful
@@ -2798,15 +2802,15 @@ build_ffmpeg_dependencies() {
   build_lensfun  # requires png, zlib, iconv
   # build_libtensorflow # broken
   build_libvpx
-  build_libx265
+  #build_libx265
   build_libopenh264
   build_libaom
   build_dav1d
-  if [[ $OSTYPE != darwin* ]]; then
-    build_vulkan
-  fi
+  #if [[ $OSTYPE != darwin* ]]; then
+    #build_vulkan
+  #fi
   build_avisynth
-  build_libx264 # at bottom as it might internally build a copy of ffmpeg (which needs all the above deps...
+  #build_libx264 # at bottom as it might internally build a copy of ffmpeg (which needs all the above deps...
  }
 
 build_apps() {
@@ -2902,6 +2906,7 @@ ffmpeg_git_checkout="https://github.com/FFmpeg/FFmpeg.git"
 ffmpeg_source_dir=
 build_svt_hevc=n
 build_svt_vp9=n
+build_svt_av1=n
 
 # parse command line parameters, if any
 while true; do
@@ -2928,7 +2933,8 @@ while true; do
       --build-ismindex=n [builds ffmpeg utility ismindex.exe]
       -a 'build all' builds ffmpeg, mplayer, vlc, etc. with all fixings turned on [many disabled from disuse these days]
       --build-svt-hevc=n [builds libsvt-hevc modules within ffmpeg etc.]
-      --build-svt-vp9=n [builds libsvt-hevc modules within ffmpeg etc.]
+      --build-svt-vp9=n [builds libsvt-vp9 modules within ffmpeg etc.]
+      --build-svt-av1=n [builds libsvt-av1 modules within ffmpeg etc.]
       --build-dvbtee=n [build dvbtee.exe a DVB profiler]
       --compiler-flavors=[multi,win32,win64,native] [default prompt, or skip if you already have one built, multi is both win32 and win64]
       --cflags=[default is $original_cflags, which works on any cpu, see README for options]
@@ -2967,6 +2973,7 @@ while true; do
                  sandbox_ok=y; build_amd_amf=y; build_intel_qsv=y; build_dvbtee=y; build_x264_with_libav=y; shift ;;
     --build-svt-hevc=* ) build_svt_hevc="${1#*=}"; shift ;;
     --build-svt-vp9=* ) build_svt_vp9="${1#*=}"; shift ;;
+    --build-svt-av1=* ) build_svt_av1="${1#*=}"; shift ;;
     -d         ) echo "defaults: doing 64 bit only, fast"; gcc_cpu_count=$cpu_count; disable_nonfree="y"; sandbox_ok="y"; compiler_flavors="win64"; git_get_latest="n"; shift ;;
     --compiler-flavors=* )
          compiler_flavors="${1#*=}";

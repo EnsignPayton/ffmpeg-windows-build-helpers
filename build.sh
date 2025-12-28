@@ -6,7 +6,7 @@
 ./cross_compile_ffmpeg.sh \
 	--build-ffmpeg-static=n \
 	--build-ffmpeg-shared=y \
-	--ffmpeg-git-checkout-version=master \
+	--ffmpeg-git-checkout-version=n4.4.6 \
 	--disable-nonfree=y \
 	--build-intel-qsv=y \
 	--compiler-flavors=multi \
