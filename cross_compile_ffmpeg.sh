@@ -2400,9 +2400,10 @@ build_ffmpeg() {
     postpend_configure_opts="--enable-static --disable-shared --prefix=${install_prefix}"
   fi
 
-  if [[ $ffmpeg_git_checkout_version == *"n4.4"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.3"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.2"* ]]; then
-    postpend_configure_opts="${postpend_configure_opts} --disable-libdav1d " # dav1d has diverged since so isn't compat with older ffmpegs
-  fi
+  # TODO: Fix it instead. Maybe use an older version of libdav1d.
+  #if [[ $ffmpeg_git_checkout_version == *"n4.4"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.3"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.2"* ]]; then
+    #postpend_configure_opts="${postpend_configure_opts} --disable-libdav1d " # dav1d has diverged since so isn't compat with older ffmpegs
+  #fi
 
   cd $output_dir
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
@@ -2573,6 +2574,8 @@ build_ffmpeg() {
     fi
     # other possibilities:
     #   --enable-w32threads # [worse UDP than pthreads, so not using that]
+
+    config_options+=" --enable-avresample"
 
     for i in $CFLAGS; do
       config_options+=" --extra-cflags=$i" # --extra-cflags may not be needed here, but adds it to the final console output which I like for debugging purposes
