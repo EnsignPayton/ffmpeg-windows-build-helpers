@@ -2527,6 +2527,7 @@ build_ffmpeg() {
     fi
 
     # the order of extra-libs switches is important (appended in reverse)
+    config_options+=" --extra-libs=-lharfbuzz"
     config_options+=" --extra-libs=-lz"
     config_options+=" --extra-libs=-lpng"
     config_options+=" --extra-libs=-lm" # libflite seemed to need this linux native...and have no .pc file huh?
