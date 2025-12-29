@@ -1856,7 +1856,12 @@ build_libaom() {
 }
 
 build_dav1d() {
-  do_git_checkout https://code.videolan.org/videolan/dav1d.git libdav1d
+  if [[ $ffmpeg_git_checkout_version == *"n4.4"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.3"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.2"* ]]; then
+    do_git_checkout https://code.videolan.org/videolan/dav1d.git libdav1d "0.9.2"
+  else
+    do_git_checkout https://code.videolan.org/videolan/dav1d.git libdav1d
+  fi
+
   cd libdav1d
     if [[ $bits_target == 32 || $bits_target == 64 ]]; then # XXX why 64???
       apply_patch file://$patch_dir/david_no_asm.patch -p1 # XXX report
@@ -2400,18 +2405,11 @@ build_ffmpeg() {
     postpend_configure_opts="--enable-static --disable-shared --prefix=${install_prefix}"
   fi
 
-  # TODO: Fix it instead. Maybe use an older version of libdav1d.
-  #if [[ $ffmpeg_git_checkout_version == *"n4.4"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.3"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.2"* ]]; then
-    #postpend_configure_opts="${postpend_configure_opts} --disable-libdav1d " # dav1d has diverged since so isn't compat with older ffmpegs
-  #fi
-
   cd $output_dir
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
 
-    # Lazy check, just copied above
     if [[ $ffmpeg_git_checkout_version == *"n4.4"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.3"* ]] || [[ $ffmpeg_git_checkout_version == *"n4.2"* ]]; then
       git apply $patch_dir/ffmpeg.git-f9626d1065c43f1d51afe66bdf988b9f33729440.patch
-      git apply $patch_dir/ffmpeg.git-f01fdedb69e4accb1d1555106d8f682ff1f1ddc7.patch
     fi
 
     if [ "$bits_target" = "32" ]; then
