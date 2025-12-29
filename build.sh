@@ -6,7 +6,8 @@
 	--ffmpeg-git-checkout-version=n4.3.1 \
 	--disable-nonfree=y \
 	--build-intel-qsv=y \
-	--compiler-flavors=multi \
+	--compiler-flavors=win64 \
+	--git-get-latest=n \
 	--prefer-stable=y \
 	--enable-gpl=n \
 	--build-dependencies=y
