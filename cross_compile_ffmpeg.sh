@@ -2437,6 +2437,7 @@ build_ffmpeg() {
     #config_options+=" --enable-libtesseract"
     #config_options+=" --enable-fontconfig"
     config_options+=" --enable-gmp"
+    config_options+=" --enable-gnutls"
     config_options+=" --enable-libass"
     #config_options+=" --enable-libbluray"
     #config_options+=" --enable-libbs2b"
@@ -2468,10 +2469,10 @@ build_ffmpeg() {
     config_options+=" --enable-libopenh264"
     #config_options+=" --enable-libvmaf"
     config_options+=" --enable-libsrt"
+    config_options+=" --enable-demuxer=dash"
     config_options+=" --enable-libxml2"
     config_options+=" --enable-opengl"
     config_options+=" --enable-libdav1d"
-    config_options+=" --enable-gnutls"
 
     #if [[ $OSTYPE != darwin* ]]; then
       #config_options+=" --enable-vulkan"
@@ -2518,8 +2519,8 @@ build_ffmpeg() {
         config_options+=" --enable-libsvtav1"
       fi
     fi # else doesn't work/matter with 32 bit
-    config_options+=" --enable-libvpx"
     config_options+=" --enable-libaom"
+    config_options+=" --enable-libvpx"
 
     if [[ $compiler_flavors != "native" ]]; then
       config_options+=" --enable-nvenc --enable-nvdec" # don't work OS X
