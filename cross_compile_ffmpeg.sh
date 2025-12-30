@@ -1209,6 +1209,26 @@ build_gnutls() {
   cd ..
 }
 
+build_libgpg-error() {
+  generic_download_and_make_and_install https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.58.tar.bz2
+}
+
+build_libgcrypt() {
+  generic_download_and_make_and_install https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.2.tar.bz2
+}
+
+build_libssh() {
+  download_and_unpack_file https://www.libssh.org/files/0.10/libssh-0.10.6.tar.xz
+  cd libssh-0.10.6
+    rm CMakeCache.txt
+    mkdir -p build
+    cd build
+    do_cmake_from_build_dir ".." "-DWITH_GCRYPT=ON"
+    do_make_and_make_install
+    cd ..
+  cd ..
+}
+
 build_openssl-1.0.2() {
   download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2p.tar.gz
   cd openssl-1.0.2p
@@ -2526,6 +2546,8 @@ build_ffmpeg() {
       config_options+=" --enable-nvenc --enable-nvdec" # don't work OS X
     fi
 
+    config_options+=" --enable-libssh"
+
     # the order of extra-libs switches is important (appended in reverse)
     config_options+=" --extra-libs=-lharfbuzz"
     #config_options+=" --extra-libs=-lz"
@@ -2821,6 +2843,9 @@ build_ffmpeg_dependencies() {
   #fi
   build_avisynth
   #build_libx264 # at bottom as it might internally build a copy of ffmpeg (which needs all the above deps...
+  build_libgpg-error
+  build_libgcrypt
+  build_libssh
  }
 
 build_apps() {
